@@ -12,16 +12,17 @@ on:
   push:
     paths:
       - 'product/**'		
-    branches: [ "master" ]
   pull_request:
     paths:
       - 'product/**'	
-    branches: [ "master" ]
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: product
 
     steps:
     - uses: actions/checkout@v4

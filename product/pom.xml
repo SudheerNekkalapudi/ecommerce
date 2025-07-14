@@ -122,6 +122,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>product</finalName>
 	</build>
 
 </project>

@@ -10,9 +10,6 @@ name: Java CI with Maven
 
 on:
   push:
-    paths:
-      - 'product/**'
-      - 'Dockerfile'		
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]

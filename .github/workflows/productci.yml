@@ -6,15 +6,16 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Java CI with Maven
+name: Product CI
 
 on:
   push:
     paths:
-      - 'product/**'
-      - 'Dockerfile'		
+      - 'product/**'		
     branches: [ "master" ]
   pull_request:
+    paths:
+      - 'product/**'	
     branches: [ "master" ]
 
 jobs:

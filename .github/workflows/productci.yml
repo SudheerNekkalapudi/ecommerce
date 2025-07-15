@@ -10,11 +10,11 @@ name: Product CI
 
 on:
   push:
-    paths:
-      - 'product/**'		
+    branches: [master, main]
+    paths: ['product/**']		
   pull_request:
-    paths:
-      - 'product/**'	
+    branches: [master, main]
+    paths: ['product/**']	
 
 jobs:
   build:

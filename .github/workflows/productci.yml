@@ -38,7 +38,7 @@ jobs:
           image: sudheern87/product-image
           tags: latest
           registry: docker.io
-          dockerfile: Dockerfile
+          dockerfile: product/Dockerfile
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 

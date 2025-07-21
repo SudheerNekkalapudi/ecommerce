@@ -35,10 +35,11 @@ jobs:
       - name: Build & push Docker image
         uses: mr-smithers-excellent/docker-build-push@v6
         with:
-          image: sudheern87/product
+          image: sudheern87/product-image
           tags: latest
           registry: docker.io
           dockerfile: product/Dockerfile
+          context: product
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
@@ -56,6 +57,6 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            docker pull sudheern87/product
+            docker pull sudheern87/product-image
             docker rm -f product-container || true
-            docker run -d -p 8080:8080 --name product-container sudheern87/product
+            docker run -d -p 8080:8080 --name product-container sudheern87/product-image

@@ -1,22 +1,18 @@
-name: Product CI
+name: Build and Deploy Product Service
 
 on:
   push:
-    branches: [master, main]
-    paths: ['product/**']
+    branches: [ "master" ]
   pull_request:
-    branches: [master, main]
-    paths: ['product/**']
+    branches: [ "master" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: product
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -26,15 +22,32 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: mvn clean install
+        run: mvn clean install -DskipTests
 
-      - name: Build & Push Docker image
+      - name: Build & push Docker image
         uses: mr-smithers-excellent/docker-build-push@v6
         with:
           image: sudheern87/product-image
           tags: latest
           registry: docker.io
-          dockerfile: product/Dockerfile
-          context: product
+          dockerfile: Dockerfile
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+
+    steps:
+      - name: Deploy to AWS EC2 via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            docker pull sudheern87/product-image
+            docker rm -f product-container || true
+            docker run -d -p 8080:8080 --name product-container sudheern87/product-image

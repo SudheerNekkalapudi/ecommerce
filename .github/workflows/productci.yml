@@ -29,6 +29,7 @@ jobs:
           cache: maven
 
       - name: Build with Maven
+        working-directory: product
         run: mvn clean install -DskipTests
 
       - name: Build & push Docker image

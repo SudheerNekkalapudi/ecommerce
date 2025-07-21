@@ -3,8 +3,15 @@ name: Build and Deploy Product Service
 on:
   push:
     branches: [ "master" ]
+    paths:
+      - 'product/**'
+      - '.github/workflows/productci.yml'
+
   pull_request:
     branches: [ "master" ]
+    paths:
+      - 'product/**'
+      - '.github/workflows/productci.yml'
 
 jobs:
   build:

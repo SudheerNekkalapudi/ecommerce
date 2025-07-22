@@ -36,7 +36,7 @@ jobs:
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker Image
-        run: docker build -f product/Dockerfile -t sudheern87/product-image:latest .
+        run: docker build -f product/Dockerfile -t sudheern87/product-image:latest product
 
       - name: Publish image to Docker Hub
         run: docker push sudheern87/product-image:latest

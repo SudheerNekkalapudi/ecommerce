@@ -1,4 +1,4 @@
-name: Build and Deploy Product Service
+name: Product CI/CD Pipeline
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Source
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -32,31 +32,29 @@ jobs:
         working-directory: product
         run: mvn clean install -DskipTests
 
-      - name: Build & push Docker image
-        uses: mr-smithers-excellent/docker-build-push@v6
-        with:
-          image: sudheern87/product-image
-          tags: latest
-          registry: docker.io
-          dockerfile: product/Dockerfile
-          context: product
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Login to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker Image
+        run: docker build -t sudheern87/product-image:latest .
+
+      - name: Publish image to Docker Hub
+        run: docker push sudheern87/product-image:latest
 
   deploy:
-    needs: build
+    needs: build  # 👈 Ensures deploy runs after build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master'  # 👈 Optional safety check
 
     steps:
       - name: Deploy to AWS EC2 via SSH
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            docker pull sudheern87/product-image
+            docker pull sudheern87/product-image:latest
             docker rm -f product-container || true
-            docker run -d -p 8080:8080 --name product-container sudheern87/product-image
+            docker run -d -p 8080:8080 --name product-container sudheern87/product-image:latest
